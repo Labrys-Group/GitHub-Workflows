@@ -15,6 +15,10 @@ on:
       TURBO_SCOPE:
         required: true
         type: string
+      LASTEST_TAG:
+        required: false
+        type: string
+        default: "latest"
 
     secrets:
       GCLOUD_CREDENTIALS:
@@ -44,11 +48,11 @@ jobs:
 
       - name: Build the Docker image
         run: |
-          docker pull ${{ inputs.DOCKER_IMAGE_NAME }}:latest || true
-          docker build --cache-from ${{ inputs.DOCKER_IMAGE_NAME }}:latest -t ${{ inputs.DOCKER_IMAGE_NAME }}:latest -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }} -f ${{ inputs.DOCKERFILE }} .
+          docker pull ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LASTEST_TAG }} || true
+          docker build --cache-from ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LASTEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LASTEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }} -f ${{ inputs.DOCKERFILE }} .
 
       # Push the Docker image to Google Container Registry
       - name: Publish
         run: |-
-          docker push ${{ inputs.DOCKER_IMAGE_NAME }}:latest
+          docker push ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LASTEST_TAG }}
           docker push ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }}
