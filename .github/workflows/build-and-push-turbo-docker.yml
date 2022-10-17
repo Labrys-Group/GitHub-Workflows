@@ -1,0 +1,54 @@
+name: Build Turborepo Docker Image and Push to Artifact Registry
+
+on:
+  workflow_call:
+    inputs:
+      DOCKERFILE:
+        required: true
+        type: string
+      DOCKER_IMAGE_NAME:
+        required: true
+        type: string
+      ARTIFACT_REGISTRY_URL:
+        required: true
+        type: string
+      TURBO_SCOPE:
+        required: true
+        type: string
+
+    secrets:
+      GCLOUD_CREDENTIALS:
+        required: true
+
+jobs:
+  build_and_push_docker_image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: "${{ secrets.GCLOUD_CREDENTIALS }}"
+
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v0"
+
+      - name: GCP Docker Auth
+        run: gcloud --quiet auth configure-docker ${{ inputs.ARTIFACT_REGISTRY_URL }}
+
+      - name: Turborepo Prune
+        run: npx turbo prune --scope=${{ inputs.TURBO_SCOPE }} --docker
+
+      - name: Build the Docker image
+        run: |
+          docker pull ${{ inputs.DOCKER_IMAGE_NAME }}:latest || true
+          docker build --cache-from ${{ inputs.DOCKER_IMAGE_NAME }}:latest -t ${{ inputs.DOCKER_IMAGE_NAME }}:latest -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }} -f ${{ inputs.DOCKERFILE }} .
+
+      # Push the Docker image to Google Container Registry
+      - name: Publish
+        run: |-
+          docker push ${{ inputs.DOCKER_IMAGE_NAME }}:latest
+          docker push ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }}

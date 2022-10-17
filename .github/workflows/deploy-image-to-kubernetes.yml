@@ -1,0 +1,51 @@
+name: Deploy Docker Image to Kubernetes Deployment
+
+on:
+  workflow_call:
+    inputs:
+      CLUSTER_NAME:
+        required: true
+        type: string
+      CLUSTER_ZONE:
+        required: true
+        type: string
+      PROJECT_ID:
+        required: true
+        type: string
+      DEPLOYMENT:
+        required: true
+        type: string
+      IMAGE_TAG:
+        required: true
+        type: string
+    secrets:
+      GCLOUD_CREDENTIALS:
+        required: true
+
+jobs:
+  deploy_to_kubernetes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: "${{ secrets.GCLOUD_CREDENTIALS }}"
+
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v0"
+
+      - name: "Kubectl Auth"
+        run: gcloud container clusters get-credentials ${{ inputs.CLUSTER_NAME }} --zone ${{ inputs.CLUSTER_ZONE }} --project ${{ inputs.PROJECT_ID }}
+
+      - name: "Deploy Image"
+        run: |
+          kubectl set image deployment/${{ inputs.DEPLOYMENT }} ${{ inputs.DEPLOYMENT }}=${{ inputs.IMAGE_TAG }}
+          if ! kubectl rollout status deployment/${{ inputs.DEPLOYMENT }}; then
+            kubectl rollout undo deployment/${{ inputs.DEPLOYMENT }}
+            kubectl rollout status deployment/${{ inputs.DEPLOYMENT }}
+            exit 1
+          fi
