@@ -15,7 +15,7 @@ on:
       TURBO_SCOPE:
         required: true
         type: string
-      LASTEST_TAG:
+      LATEST_TAG:
         required: false
         type: string
         default: "latest"
