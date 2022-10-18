@@ -48,11 +48,11 @@ jobs:
 
       - name: Build the Docker image
         run: |
-          docker pull ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LASTEST_TAG }} || true
-          docker build --cache-from ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LASTEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LASTEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }} -f ${{ inputs.DOCKERFILE }} .
+          docker pull ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} || true
+          docker build --cache-from ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }} -f ${{ inputs.DOCKERFILE }} .
 
       # Push the Docker image to Google Container Registry
       - name: Publish
         run: |-
-          docker push ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LASTEST_TAG }}
+          docker push ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }}
           docker push ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }}
