@@ -25,6 +25,7 @@ on:
 jobs:
   deploy_to_kubernetes:
     runs-on: ubuntu-latest
+    name: ☸️ Deploy to Kubernetes
 
     steps:
       - name: Checkout
