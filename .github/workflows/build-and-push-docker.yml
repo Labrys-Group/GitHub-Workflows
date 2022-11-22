@@ -1,0 +1,53 @@
+name: Build Docker Image and Push to Artifact Registry
+
+on:
+  workflow_call:
+    inputs:
+      DOCKERFILE:
+        required: true
+        type: string
+      DOCKER_IMAGE_NAME:
+        required: true
+        type: string
+      ARTIFACT_REGISTRY_URL:
+        required: true
+        type: string
+      LATEST_TAG:
+        required: false
+        type: string
+        default: "latest"
+
+    secrets:
+      GCLOUD_CREDENTIALS:
+        required: true
+
+jobs:
+  build_and_push_docker_image:
+    name: 🐳 Build and Push Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: "${{ secrets.GCLOUD_CREDENTIALS }}"
+
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v0"
+
+      - name: GCP Docker Auth
+        run: gcloud --quiet auth configure-docker ${{ inputs.ARTIFACT_REGISTRY_URL }}
+
+      - name: Build the Docker image
+        run: |
+          docker pull ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} || true
+          docker build --cache-from ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }} -f ${{ inputs.DOCKERFILE }} .
+
+      # Push the Docker image to Google Container Registry
+      - name: Publish
+        run: |-
+          docker push ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }}
+          docker push ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }}
