@@ -36,14 +36,12 @@ jobs:
         with:
           credentials_json: "${{ secrets.GCLOUD_CREDENTIALS }}"
 
-      - name: "Set up Cloud SDK"
-        uses: "google-github-actions/setup-gcloud@v0"
-        
-      - name: "Install Gcloud Auth Plugin"
-        run: gcloud components install gke-gcloud-auth-plugin
-
-      - name: "Kubectl Auth"
-        run: gcloud container clusters get-credentials ${{ inputs.CLUSTER_NAME }} --zone ${{ inputs.CLUSTER_ZONE }} --project ${{ inputs.PROJECT_ID }}
+      - id: 'get-credentials'
+        uses: 'google-github-actions/get-gke-credentials@v1'
+        with:
+          cluster_name: '${{ inputs.CLUSTER_NAME }}'
+          zone: '${{ inputs.CLUSTER_ZONE }}'
+          project_id: "${{ inputs.PROJECT_ID }}"
 
       - name: "Deploy Image"
         run: |
