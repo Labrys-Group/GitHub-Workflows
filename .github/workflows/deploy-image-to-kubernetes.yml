@@ -36,11 +36,11 @@ jobs:
         with:
           credentials_json: "${{ secrets.GCLOUD_CREDENTIALS }}"
 
-      - id: 'get-credentials'
-        uses: 'google-github-actions/get-gke-credentials@v1'
+      - id: "get-credentials"
+        uses: "google-github-actions/get-gke-credentials@v1"
         with:
-          cluster_name: '${{ inputs.CLUSTER_NAME }}'
-          zone: '${{ inputs.CLUSTER_ZONE }}'
+          cluster_name: "${{ inputs.CLUSTER_NAME }}"
+          location: "${{ inputs.CLUSTER_ZONE }}"
           project_id: "${{ inputs.PROJECT_ID }}"
 
       - name: "Deploy Image"
