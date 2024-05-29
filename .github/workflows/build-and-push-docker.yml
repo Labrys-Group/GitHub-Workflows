@@ -55,12 +55,13 @@ jobs:
           docker push ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }}
 
       - name: Set release in Sentry
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           # Install the cli
           curl -sL https://sentry.io/get-cli/ | bash
           
           # Setup configuration values
-          SENTRY_AUTH_TOKEN=b5f5009548890c4d548425aa38375717d0bba5837aa4e5bb51e26236c253341f # From internal integration: koa-app Release Integration
           SENTRY_ORG=pegs
           SENTRY_PROJECT=koa-app
           VERSION=`sentry-cli releases propose-version`
