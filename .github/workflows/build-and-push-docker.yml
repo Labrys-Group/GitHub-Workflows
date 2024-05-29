@@ -69,4 +69,4 @@ jobs:
           SENTRY_PROJECT: koa-app
           SENTRY_URL: https://sentry.io/
         with:
-          environment: production
+          environment: ${{ inputs.SENTRY_ENV }}
