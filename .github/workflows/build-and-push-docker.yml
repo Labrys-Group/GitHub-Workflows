@@ -19,6 +19,9 @@ on:
       SENTRY_ENV:
         required: true
         type: string
+      SENTRY_PROJECT:
+        required: true
+        type: string
 
     secrets:
       GCLOUD_CREDENTIALS:
@@ -66,7 +69,7 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_RELEASE_AUTH_TOKEN }}
           SENTRY_ORG: pegs
-          SENTRY_PROJECT: koa-app
+          SENTRY_PROJECT: ${{ inputs.SENTRY_PROJECT }}
           SENTRY_URL: https://sentry.io/
         with:
           environment: ${{ inputs.SENTRY_ENV }}
