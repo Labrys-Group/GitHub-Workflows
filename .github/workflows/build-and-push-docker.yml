@@ -44,11 +44,9 @@ jobs:
         run: gcloud --quiet auth configure-docker ${{ inputs.ARTIFACT_REGISTRY_URL }}
 
       - name: Build the Docker image
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           docker pull ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} || true
-          docker build --build-arg SENTRY_AUTH_TOKEN=${{ env.SENTRY_AUTH_TOKEN }} --cache-from ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }} -f ${{ inputs.DOCKERFILE }} .
+          docker build --build-arg SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} --cache-from ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }} -f ${{ inputs.DOCKERFILE }} .
 
       # Push the Docker image to Google Container Registry
       - name: Publish
