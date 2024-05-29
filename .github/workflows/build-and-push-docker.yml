@@ -25,6 +25,8 @@ on:
         required: true
       SENTRY_AUTH_TOKEN:
         required: true
+      SENTRY_RELEASE_AUTH_TOKEN:
+        required: true
 
 jobs:
   build_and_push_docker_image:
@@ -62,7 +64,7 @@ jobs:
       - name: Create Sentry release
         uses: getsentry/action-release@v1
         env:
-          SENTRY_AUTH_TOKEN: b5f5009548890c4d548425aa38375717d0bba5837aa4e5bb51e26236c253341f
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_RELEASE_AUTH_TOKEN }}
           SENTRY_ORG: pegs
           SENTRY_PROJECT: koa-app
           SENTRY_URL: https://sentry.io/
