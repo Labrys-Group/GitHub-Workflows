@@ -45,10 +45,15 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Create Yarn cache directory
+        run: |
+          mkdir -p /tmp/yarn-cache
+          yarn config set cache-folder /tmp/yarn-cache
+
       - name: Cache Yarn packages
         uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
+          path: /tmp/yarn-cache
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -75,12 +80,11 @@ jobs:
           cache-to: type=inline
           build-args: |
             BUILDKIT_INLINE_CACHE=1
-          # Mount the Yarn cache directory into the Docker build
           secrets: |
             GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
           # Mount the Yarn cache directory
           build-contexts: |
-            yarn-cache=~/.cache/yarn
+            yarn-cache=/tmp/yarn-cache
 
       - name: Create Sentry release
         uses: getsentry/action-release@v1
