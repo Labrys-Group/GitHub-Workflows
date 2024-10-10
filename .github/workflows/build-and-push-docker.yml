@@ -54,6 +54,8 @@ jobs:
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         with:
           context: .
           file: ${{ inputs.DOCKERFILE }}
@@ -63,8 +65,6 @@ jobs:
             ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }}
           cache-from: type=registry,ref=${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }}
           cache-to: type=inline
-          build-args: |
-            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Create Sentry release
         uses: getsentry/action-release@v1
