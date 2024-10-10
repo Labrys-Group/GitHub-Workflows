@@ -76,8 +76,8 @@ jobs:
           tags: |
             ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }}
             ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }}
-          cache-from: type=registry,ref=${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }}
-          cache-to: type=inline
+          cache-from: type=registry,ref=${{ inputs.DOCKER_IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ inputs.DOCKER_IMAGE_NAME }}:buildcache,mode=max
           build-args: |
             BUILDKIT_INLINE_CACHE=1
           secrets: |
