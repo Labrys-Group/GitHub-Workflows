@@ -53,16 +53,29 @@ jobs:
       - name: GCP Docker Auth
         run: gcloud --quiet auth configure-docker ${{ inputs.ARTIFACT_REGISTRY_URL }}
 
-      - name: Build the Docker image
-        run: |
-          docker pull ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} || true
-          docker build --build-arg SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} --cache-from ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }} -t ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }} -f ${{ inputs.DOCKERFILE }} .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      # Push the Docker image to Google Container Registry
-      - name: Publish
-        run: |-
-          docker push ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }}
-          docker push ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }}
+      - name: Login to Artifact Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ inputs.ARTIFACT_REGISTRY_URL }}
+          username: _json_key
+          password: ${{ secrets.GCLOUD_CREDENTIALS }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ${{ inputs.DOCKERFILE }}
+          push: true
+          tags: |
+            ${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }}
+            ${{ inputs.DOCKER_IMAGE_NAME }}:${{ github.sha }}
+          cache-from: type=registry,ref=${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.LATEST_TAG }}
+          cache-to: type=inline
+          build-args: |
+            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Create Sentry release
         uses: getsentry/action-release@v1
