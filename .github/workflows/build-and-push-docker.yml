@@ -50,6 +50,10 @@ jobs:
           mkdir -p /tmp/yarn-cache
           yarn config set cache-folder /tmp/yarn-cache
 
+      - name: Create Turborepo cache directory
+        run: |
+          mkdir -p .turbo
+
       - name: Cache Yarn packages
         uses: actions/cache@v3
         with:
