@@ -58,6 +58,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
+      # Add Turborepo cache steps
+      - name: Cache Turborepo
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
       - name: Login to Artifact Registry
         uses: docker/login-action@v2
         with:
@@ -82,9 +91,10 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
           secrets: |
             GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
-          # Mount the Yarn cache directory
+          # Mount both Yarn and Turborepo cache directories
           build-contexts: |
             yarn-cache=/tmp/yarn-cache
+            turbo-cache=.turbo
 
       - name: Create Sentry release
         uses: getsentry/action-release@v1
