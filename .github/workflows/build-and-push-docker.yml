@@ -86,10 +86,10 @@ jobs:
           cache-to: type=registry,ref=${{ inputs.DOCKER_IMAGE_NAME }}:buildcache,mode=max
           build-args: |
             BUILDKIT_INLINE_CACHE=1
-          secrets: |
-            GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
             TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
             TURBO_TEAM=${{ secrets.TURBO_TEAM }}
+          secrets: |
+            GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
           # Mount both Yarn and Turborepo cache directories
           build-contexts: |
             yarn-cache=/tmp/yarn-cache
