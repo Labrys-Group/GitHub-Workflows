@@ -30,6 +30,10 @@ on:
         required: true
       SENTRY_RELEASE_AUTH_TOKEN:
         required: true
+      TURBO_TOKEN:
+        required: true
+      TURBO_TEAM:
+        required: true
 
 jobs:
   build_and_push_docker_image:
@@ -69,6 +73,8 @@ jobs:
         uses: docker/build-push-action@v4
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
         with:
           context: .
           file: ${{ inputs.DOCKERFILE }}
@@ -82,6 +88,8 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
           secrets: |
             GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
+            TURBO_TEAM=${{ secrets.TURBO_TEAM }}
           # Mount both Yarn and Turborepo cache directories
           build-contexts: |
             yarn-cache=/tmp/yarn-cache
