@@ -16,19 +16,9 @@ on:
         required: false
         type: string
         default: "latest"
-      SENTRY_ENV:
-        required: true
-        type: string
-      SENTRY_PROJECT:
-        required: true
-        type: string
 
     secrets:
       GCLOUD_CREDENTIALS:
-        required: true
-      SENTRY_AUTH_TOKEN:
-        required: true
-      SENTRY_RELEASE_AUTH_TOKEN:
         required: true
       TURBO_TOKEN:
         required: true
@@ -72,7 +62,6 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
           TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
         with:
@@ -93,13 +82,3 @@ jobs:
           # Mount both Yarn and Turborepo cache directories
           build-contexts: |
             yarn-cache=/tmp/yarn-cache
-
-      - name: Create Sentry release
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_RELEASE_AUTH_TOKEN }}
-          SENTRY_ORG: pegs
-          SENTRY_PROJECT: ${{ inputs.SENTRY_PROJECT }}
-          SENTRY_URL: https://sentry.io/
-        with:
-          environment: ${{ inputs.SENTRY_ENV }}
