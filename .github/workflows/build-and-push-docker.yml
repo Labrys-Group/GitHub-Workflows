@@ -77,6 +77,7 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
             TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
             TURBO_TEAM=${{ secrets.TURBO_TEAM }}
+            GIT_HASH=${{ github.sha }}
           secrets: |
             GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
           # Mount both Yarn and Turborepo cache directories
